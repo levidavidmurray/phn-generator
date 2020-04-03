@@ -2,16 +2,18 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "strict": true,
+    "strict": false,
     "jsx": "preserve",
     "importHelpers": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
+    "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
-      "webpack-env"
+      "webpack-env",
+      "vuetify"
     ],
     "paths": {
       "@/*": [
@@ -25,6 +27,10 @@
       "scripthost"
     ]
   },
+  "typeRoots": [
+    "./node_modules/@types",
+    "./node_modules/vuetify/types"
+  ],
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",

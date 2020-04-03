@@ -1,61 +1,142 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-typescript" target="_blank" rel="noopener">typescript</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-  </div>
+    <v-container>
+        <v-col cols="12">
+            <v-row justify="center">
+                <v-card width="75vw" max-width="1360px">
+
+                    <v-system-bar></v-system-bar>
+                    <v-toolbar flat>
+                        <v-toolbar-title>Personal Health Number Generator</v-toolbar-title>
+
+                        <v-spacer></v-spacer>
+
+                        <v-btn color="pink" class="white--text" @click="generate">Generate</v-btn>
+                    </v-toolbar>
+
+                    <v-row dense class="pa-4" justify="space-around">
+                        <v-col v-for="(province) in hinProvinces" :key="province[0]" cols="5">
+                            <h3 class="pink--text text-uppercase ml-4" v-text="province[1]"></h3>
+
+                            <v-divider></v-divider>
+
+                            <v-list-item-group color="pink" class="text-center" multiple v-model="selected[province[0]]">
+                                <v-list-item
+                                        @click="handleClick(hin)"
+                                        v-for="(hin) in hins[province[0]]"
+                                        active-class="active-hin"
+                                        :key="hin"
+                                >
+                                    <input type="hidden" :value="hin" :id="`hin-${hin}`">
+                                    <v-list-item-icon>
+                                        <v-icon dense>mdi-content-copy</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                        <v-list-item-title v-text="hin"></v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list-item-group>
+                        </v-col>
+                    </v-row>
+                </v-card>
+            </v-row>
+        </v-col>
+
+        <v-snackbar v-model="snackbar.active" :timeout="snackbar.timeout">
+            Copied to clipboard
+            <v-btn color="pink" text @click="snackbar.active = false">Close</v-btn>
+        </v-snackbar>
+    </v-container>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+    import Vue from 'vue'
+    import copy from 'copy-to-clipboard';
+    import {generateHin, Province} from "@/lib/Validator";
 
-export default Vue.extend({
-  name: 'HelloWorld',
-  props: {
-    msg: String,
-  },
-});
+    export default Vue.extend({
+        name: 'HelloWorld',
+
+        data: () => ({
+            snackbar: {
+                active: false,
+                timeout: 2000,
+            },
+            count: 10,
+
+            selected: {
+                bc: [],
+                on: [],
+            },
+
+            hins: {
+                bc: [],
+                on: [],
+            },
+            provinces: {
+                bc: 'British Columbia',
+                on: 'Ontario',
+            }
+        }),
+
+        created() {
+            this.generate();
+        },
+
+        methods: {
+            handleClick(hin: string) {
+                copy(hin);
+                this.snackbar.active = true;
+            },
+
+            generate() {
+                this.selected.bc = [];
+                this.selected.on = [];
+
+                const bcHins = this.getBC();
+                const onHins = this.getON();
+
+                this.hins.bc = bcHins;
+                this.hins.on = onHins;
+            },
+
+            getBC() {
+                const hins = [];
+
+                for (let i = 0; i < this.count; i++) {
+                    hins.push(generateHin());
+                }
+
+                return hins;
+            },
+
+            getON() {
+                const hins = [];
+
+                for (let i = 0; i < this.count; i++) {
+                    hins.push(generateHin(Province.ON));
+                }
+
+                return hins;
+            }
+        },
+
+        computed: {
+            hinProvinces() {
+                return Object.entries(this.provinces);
+            }
+        }
+    })
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+    ::v-deep .active-hin {
+
+        &::before {
+            background-color: unset;
+        }
+
+        .v-list-item__title {
+            text-decoration-line: line-through;
+        }
+    }
 </style>
