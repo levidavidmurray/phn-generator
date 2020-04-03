@@ -2,8 +2,7 @@
     <v-container>
         <v-col cols="12">
             <v-row justify="center">
-                <v-card width="75vw" max-width="1360px">
-
+                <v-card :width="cardSize.width" :min-height="cardSize.height" :max-width="cardSize.maxWidth">
                     <v-system-bar></v-system-bar>
                     <v-toolbar flat>
                         <v-toolbar-title>Personal Health Number Generator</v-toolbar-title>
@@ -14,7 +13,7 @@
                     </v-toolbar>
 
                     <v-row dense class="pa-4" justify="space-around">
-                        <v-col v-for="(province) in hinProvinces" :key="province[0]" cols="5">
+                        <v-col v-for="(province) in hinProvinces" :key="province[0]" :cols="provinceCols">
                             <h3 class="pink--text text-uppercase ml-4" v-text="province[1]"></h3>
 
                             <v-divider></v-divider>
@@ -61,7 +60,6 @@
                 active: false,
                 timeout: 2000,
             },
-            count: 10,
 
             selected: {
                 bc: [],
@@ -121,8 +119,34 @@
         },
 
         computed: {
+
+            count() {
+                return this.$vuetify.breakpoint.mdAndUp ? 10 : 3;
+            },
+
             hinProvinces() {
                 return Object.entries(this.provinces);
+            },
+
+            cardSize() {
+                const {name} = this.$vuetify.breakpoint;
+
+                if (name === 'sm' || name === 'xs') {
+                    return {
+                        width: '100vw',
+                        maxWidth: '100vw',
+                        height: '100vh',
+                    }
+                } else {
+                    return {
+                        width: '75vw',
+                        maxWidth: '1100px'
+                    }
+                }
+            },
+
+            provinceCols() {
+                return this.$vuetify.breakpoint.mdAndUp ? 5 : 12;
             }
         }
     })

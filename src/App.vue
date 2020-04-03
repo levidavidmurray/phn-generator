@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar color="grey lighten-3" app flat absolute></v-app-bar>
+    <v-app-bar color="grey lighten-3" v-if="$vuetify.breakpoint.mdAndUp" app flat absolute></v-app-bar>
     <v-content class="grey lighten-3">
       <HelloWorld/>
     </v-content>
